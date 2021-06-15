@@ -1,4 +1,4 @@
-# Web App Mars Rover
+# Web App
 ## Package Dependencies
 In a new environment, make sure that python3 is installed by running the command `python3 --version`
  - if not, install python3 by executing `sudo apt install python3.6`
