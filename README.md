@@ -11,4 +11,4 @@ Submission repository of Group 22 for the Design Project for Year 2 EEE/EIE stud
 If code for the Drive or Control subsystems does not upload to their respective microcontrollers, try to plug them out from their respective carrier boards before flashing the code. Subsequently, plug them back into their carrier boards, and setup the FPGA.
 
 ## Sources
-We acknowlege the sample code provide: for Drive, Yue Zhu, for Vision, Dr Ed Stott. In addition, demo code for the D8M-GPIO camera from Terasic was used.
+We acknowlege the sample code provided: for Drive, Yue Zhu, for Vision, Dr Ed Stott. In addition, demo code for the D8M-GPIO camera from Terasic was used.
