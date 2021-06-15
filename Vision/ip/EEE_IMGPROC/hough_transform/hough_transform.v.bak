@@ -1,0 +1,153 @@
+module hough_transform (
+    input clk,
+    input rst_n,
+    input [10:0] x, input [10:0] y,
+    input canny_in,
+    input valid_in,
+
+    output valid_out,
+    output [5:0] r, output [4:0] theta,
+
+    input wen,
+    input [7:0] data_in
+);
+
+reg [10:0] buf_addr;
+reg buf_datain, buf_wen, 
+wire buf_dataout;
+buffer buf(             // Buffer is 20x60 (x * y)
+	.clock(clk),
+    .address(buf_addr), .data(buf_datain),
+    .wren(buf_wen), .q(buf_dataout)
+);
+
+reg [10:0] acc_addr;
+reg [7:0] acc_datain;
+reg acc_wen;
+wire acc_dataout;
+accum acc(              // Acc is 20x65 (theta*r)
+	.clock(clk),
+	.address(acc_addr), .data(acc_datain),
+	.wren(acc_wen), .q(acc_dataout)
+);
+
+reg [1:0] state;  
+// 0: Writing to accumulator, 1: getting result out, 2: waiting for stuff to happen
+
+reg [4:0] theta_cnt;
+reg [5:0] r_cnt;
+reg [4:0] x_cnt;
+reg [5:0] y_cnt;    // counters iterate, track state
+
+reg [7:0] max_val;  // highest accumulator value seen (so far)
+
+parameter THRESH = 8;
+reg [7:0] thresh_reg;
+
+always @ (posedge clk) begin
+    if (~rst_n) begin
+        // Reset all state
+        theta_cnt <= 0;
+        r_cnt <= 0;
+        x_cnt <= 0;
+        y_cnt <= 0;
+
+        max_val <= 0;
+        state <= 0;
+
+        buf_addr <= 0;
+        buf_datain <= 0;
+        buf_wen <= 0;
+
+        thresh_reg <= THRESH;
+
+    end else if (wen) begin
+        thresh_reg <= data_in;
+    end else if (y >= 240) begin
+        if (x >= 280 && x < 360) begin
+            valid_out <= 0;
+            // Perform compression and write to buffer
+            if (valid_in) begin
+                buf_addr <= ((x-280) >> 2) + ((y-240) >> 2) * 11'd20;   // Buffer is 20*60
+                buf_wen <= 1;
+                buf_datain <= buf_dataout || (canny_in != 0);
+
+                // Activate latter stage
+                if (x==359 && y==479) begin
+                    state <= 0;
+                    buf_wen <= 0;
+                end
+            end else begin
+                buf_wen <= 0;
+            end
+        end
+    end else begin
+
+        if (state == 2'd0) begin   // Write to Accumulator!
+            valid_out <= 0;
+
+            // Iterate through theta, x, y
+            if (y_cnt < 6'd59) begin
+                y_cnt <= y_cnt + 1;
+            end else begin
+                y_cnt <= 0;
+                if (x_cnt < 5'19) begin
+                    x_cnt <= x_cnt + 1;
+                end else begin
+                    x_cnt <= 0;
+                    if (theta_cnt < 5'd19) begin
+                        theta_cnt <= theta_cnt + 1;
+                    end else begin
+                        theta_cnt <= 0;
+                        state <= 1;
+                        x_cnt <= 0;
+                        y_cnt <= 0;
+                    end
+                end
+            end
+
+            // Perform calculations here
+            // Look at memory
+            buf_addr <= x_cnt + y_cnt*11'd20;
+
+            if (buf_dataout != 0) begin
+                // Calculate r = x*cos(theta) + y*sin(theta)
+                // acc[r][theta] += 1
+                acc_addr <= theta_cnt + r*11'd20;
+                acc_wen <= 1;
+                acc_datain <= acc_dataout + 1;
+            end else begin
+                acc_wen <= 0;
+            end
+
+        end else if (state==2'd1) begin      // Obtain final result
+            // Iterate through theta, r
+            if (theta_cnt < 5'd19) begin
+                theta_cnt <= theta_cnt + 1;
+                valid_out <= 0;
+            end else begin
+                theta_cnt <= 0;
+                if (r_cnt < 6d'63) begin
+                    r_cnt <= r_cnt + 1;
+                    valid_out <= 0;
+                end else begin
+                    valid_out <= 1; // once per frame
+                    state <= 2'd2;  // waiting for stuff to happen
+                    r <= r_max;
+                    theta <= theta_max;
+                end
+            end
+
+            // Perform calculations here
+            // look at buffer
+            acc_addr <= theta_cnt + r_cnt*11'd20;
+            if (acc_dataout > THRESH && acc_dataout > max_val) begin
+                max_val <= acc_dataout;
+                r <= r_cnt;
+                theta <= theta_cnt;
+            end
+        end
+    end
+end
+
+endmodule

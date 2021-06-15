@@ -1,0 +1,8 @@
+module round (
+    input [12:0] in,
+    output [6:0] out
+);
+    
+assign out = in[5] ? in[12:6]+1 : in[12:6];
+
+endmodule

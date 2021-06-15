@@ -1,0 +1,147 @@
+// Implementation for Canny edge detection --> Circular Hough transform
+
+/*
+    This module instanstiates a Sobel Operator.
+    As operations can be done in paralell it is not necessary to use the "more efficient" way of convolution in 1d->1d.
+
+    Sobel Operator:
+    Gx:             Gy:
+    [+1 +0 -1]      [+1 +2 +1]
+    [+2 +0 -2]      [+0 +0 +0]
+    [+1 +0 -1]      [-1 -2 -1]
+
+    Output G:
+    Sqrt(Gx^2 + Gy^2)
+*/
+module edge_detect(
+    input clk,
+    input rst_n,
+
+    input valid_in,
+    input [7:0] in_gray,
+    input [10:0] x,
+    input [10:0] y,
+    input sop,
+    input eop,
+
+    output valid_out,
+    output [7:0] out_gray   // output gray pixel
+    // output [10:0] out_x,
+    // output [10:0] out_y
+);
+
+// 3 line buffers (linearized)
+reg [7:0] buf1[639:0];
+reg [7:0] buf2[639:0];
+reg [7:0] buf3[639:0];
+
+// assign out_x = x-1;
+// assign out_y = y-1; // There is a delay
+
+// Max value Gx/Gy: 4*255 => 10 bits reqd + 1 for sgn -> 11 bits wide
+// Gx^2 needs only 20 bits as squares are always positive.
+// however as we are only taking a magnitude, we take the top 16 bits only
+// as the sqrt term will result in an 8 bit output.
+
+// We also don't need to worry about the bottom line being processed as EOP will have happened by then.
+wire [10:0] Gx_right = (x==639) ? 0 : -buf3[x+1] -buf2[x+1]<<1 -buf1[x+1];
+wire [10:0] Gy_right = (x==639) ? 0 : buf3[x+1] - buf1[x+1];
+
+wire [10:0] Gx = buf3[x-1] + buf2[x-1]<<1 + buf1[x-1] + Gx_right;
+wire [10:0] Gy = buf3[x-1] - buf1[x-1] + (buf3[x] + buf1[x])<<1 + Gy_right;
+
+wire [19:0] Gx_2_tmp = Gx*Gx;
+wire [19:0] Gy_2_tmp = Gy*Gy;
+reg [15:0] Gy_sq, Gx_sq;
+
+wire [15:0] G_sum = Gy_sq + Gx_sq;
+
+// reg valid_reg1, valid_reg2;
+
+always @ (posedge clk) begin
+    if( ~rst_n || (valid_in && eop) ) begin
+        // Reset all register contents to 0
+        genvar i;
+        generate
+            for (i=0; i<640; i=i+1) begin
+                buf1[i] <= 0;
+                buf2[i] <= 0;
+                buf3[i] <= 0;
+            end
+        endgenerate
+    end else begin
+
+        // Shift valid
+        valid_out <= valid_in;
+
+       // Writing
+        if (valid_in) begin
+
+            if (x==0) begin
+                // Shift down content of all registers.
+                // Clear buffer 1 (new line incoming)
+                // Write to the first element of register 1
+                genvar i;
+                generate
+                    for (i=1; i<640; i=i+1) begin
+                        buf3[i] <= buf2[i];
+                        buf2[i] <= buf1[i];
+                        buf1[i] <= 0;
+                    end
+                endgenerate
+                buf3[0] <= buf2[0];
+                buf2[0] <= buf1[0];
+                buf1[0] <= in_gray;
+            end
+
+            // Calculate the operator. Need to wait for data to come in.
+            if ( ~(y<1 || x<1) ) begin
+                // No need to account for top and left edge of frame: we skip those calculations at that point anyway
+                // (as data has not streamed in yet
+
+                // NAIVE IMPLEMENTATION (NO SQRT)
+                out_gray <= Gx_2_tmp[19:12] + Gy_2_tmp[19:12];
+
+                // Gy_sq <= Gy_2_tmp[19:4];
+                // Gx_sq <= Gx_2_tmp[19:4];
+
+                // out_gray <= G_sum[15:8];    // Just do this first.
+            end
+
+        end
+    end
+end
+
+/*
+function [7:0] sqrt;
+    input [15:0] num;  //declare input
+    //intermediate signals.
+    reg [15:0] a;
+    reg [7:0] q;
+    reg [17:0] left,right,r;    
+    integer i;
+begin
+    //initialize all the variables.
+    a = num;
+    q = 0;
+    i = 0;
+    left = 0;   //input to adder/sub
+    right = 0;  //input to adder/sub
+    r = 0;  //remainder
+    //run the calculations for 16 iterations.
+    for(i=0;i<16;i=i+1) begin 
+        right = {q,r[17],1'b1};
+        left = {r[15:0],a[31:30]};
+        a = {a[29:0],2'b00};    //left shift by 2 bits.
+        if (r[17] == 1) //add if r is negative
+            r = left + right;
+        else    //subtract if r is positive
+            r = left - right;
+        q = {q[14:0],!r[17]};       
+    end
+    sqrt = q;   //final assignment of output.
+end
+endfunction //end of Function
+*/
+
+endmodule

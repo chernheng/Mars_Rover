@@ -1,0 +1,12 @@
+# # File gsaved with Nlview version 6.3.8  2013-12-19 bk=1.2992 VDI=34 GEI=35
+# 
+preplace inst unsaved.EEE_IMGPROC_0 -pg 1 -lvl 1 -y 30
+preplace inst unsaved -pg 1 -lvl 1 -y 40 -regy -20
+preplace netloc EXPORT<net_container>unsaved</net_container>(SLAVE)unsaved.s1,(SLAVE)EEE_IMGPROC_0.s1) 1 0 1 NJ
+preplace netloc EXPORT<net_container>unsaved</net_container>(SLAVE)unsaved.avalon_streaming_sink,(SLAVE)EEE_IMGPROC_0.avalon_streaming_sink) 1 0 1 NJ
+preplace netloc EXPORT<net_container>unsaved</net_container>(SLAVE)EEE_IMGPROC_0.reset,(SLAVE)unsaved.reset) 1 0 1 NJ
+preplace netloc EXPORT<net_container>unsaved</net_container>(SLAVE)unsaved.conduit_mode,(SLAVE)EEE_IMGPROC_0.conduit_mode) 1 0 1 NJ
+preplace netloc EXPORT<net_container>unsaved</net_container>(SLAVE)unsaved.clock,(SLAVE)EEE_IMGPROC_0.clock) 1 0 1 NJ
+preplace netloc EXPORT<net_container>unsaved</net_container>(MASTER)EEE_IMGPROC_0.avalon_streaming_source,(MASTER)unsaved.avalon_streaming_source) 1 1 1 N
+levelinfo -pg 1 0 140 610
+levelinfo -hier unsaved 150 180 440
