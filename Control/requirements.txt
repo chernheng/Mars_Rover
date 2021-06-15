@@ -1,0 +1,5 @@
+2 Libraries are needed to run ESP32_Final.ino
+
+1. Arduino_JSON.h from library manager
+
+2. ESP8266-Websocket library found in this folder, just copy and paste the entire library into Arduino/library on this computer
