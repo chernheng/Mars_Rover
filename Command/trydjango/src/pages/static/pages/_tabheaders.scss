@@ -1,0 +1,109 @@
+.tab-boxes {
+    box-sizing: border-box;
+    padding-left: 22%;
+    padding-right: 20%;
+    height: 6%;
+}
+
+.hometab {
+    margin-bottom: 1px;
+    opacity: 1;
+    float: left;
+    box-sizing: border-box;
+    background-color: #dbc6d0;
+    border: 3px solid white;
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 -1px 3px -1px white;
+    color: black;
+    // mouse pointer changes to hand symbol
+    cursor: pointer;
+    display: block;
+    font: 100 100%/1.5 'Oswald', sans-serif;
+    letter-spacing: 0.05em;
+    margin: 0 5px;
+    
+    padding: 0% 2%;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    z-index: 1;
+    width: auto;
+    height: 100%;
+    text-align: center;
+    position: relative;
+}
+
+.hometab:hover { 
+    background-color: #D1B3C2;
+    color: #111;
+}
+
+.hometab-content {
+    background-color: black;
+    opacity: 1;
+
+    box-sizing: border-box;
+    height: 100%;
+    width: 80%;
+    text-align: center;
+    margin-left: 10%;
+    margin-right: 10%;
+    position: relative;
+    margin-top: -1px;
+    padding-top: 1px;
+    color: black;
+    z-index: 1;
+}
+
+.tablink {
+    margin-bottom: 1px;
+    opacity: 1;
+    float: left;
+    box-sizing: border-box;
+    background-color: #dbc6d0;
+    border: 3px solid white;
+    border-bottom: none;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 -1px 3px -1px white;
+    color: black;
+    // mouse pointer changes to hand symbol
+    cursor: pointer;
+    display: block;
+    font: 100 100%/1.5 'Oswald', sans-serif;
+    letter-spacing: 0.05em;
+    margin: 0 5px;
+    
+    padding: 0% 2%;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    z-index: 1;
+    width:20%;
+    min-width: auto;
+    height: 100%;
+    text-align: center;
+    position: relative;
+}
+
+.tablink:hover { 
+    background-color: #D1B3C2;
+    color: #111;
+}
+
+.tab-header {   
+    box-sizing: border-box;
+    background-color: white;
+    height: 100%;
+    width: 80%;
+    text-align: center;
+    margin-left: 10%;
+    margin-right: 10%;
+    position: relative;
+    margin-top: -1px;
+    padding-top: 1px;
+    color: black;
+    z-index: 1;
+}
+
+.tab-header + p {
+    display: block;
+}

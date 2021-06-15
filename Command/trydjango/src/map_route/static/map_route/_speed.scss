@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@1,300&display=swap');
+
+.dropdown {
+    margin-left: 10%;
+    padding:5px;
+}
+
+.dropdown button {
+	background: #222;	
+	background: linear-gradient(#333, #222);	
+	border: 1px solid #444;
+	border-radius: 5px 5px 5px 5px;
+	box-shadow: 0 2px 0 #000;
+	color: #888;
+	float: left;
+
+	font-family: 'Cabin', helvetica, arial, sans-serif;
+	font-size: 18px;
+	font-weight: 400;
+	height: 40px;
+	margin: 0;
+	padding: 0 10px;
+	text-shadow: 0 -1px 0 #000;
+	width: 200px;
+    cursor: pointer;
+}
+
+.dropdown button:hover {
+	animation: glow 800ms ease-out infinite alternate;
+	background: #222922;
+	background: linear-gradient(#333933, #222922);
+	border-color: rgb(51, 133, 153);
+	box-shadow: 0 0 5px rgba(0, 204, 255, 0.2), inset 0 0 5px rgba(0,255,0,.1), 0 2px 0 #000;
+	color: #efe;
+	outline: none;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+
+@keyframes glow {
+    0% {
+		border-color: rgb(41, 110, 128);;
+		box-shadow: 0 0 5px rgba(0, 204, 255, 0.356), inset 0 0 5px rgba(0, 204, 255, 0.13), 0 2px 0 #000;
+    }	
+    100% {
+		border-color: rgb(84, 215, 248);;
+		box-shadow: 0 0 20px rgba(0, 204, 255, 0.753), inset 0 0 10px rgba(0, 204, 255, 0.493), 0 2px 0 #000;
+    }
+}
