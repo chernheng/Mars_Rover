@@ -1,0 +1,17 @@
+.header {
+    box-sizing: border-box;
+    position: sticky;
+    text-align: center;
+    font-size: 26px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.05em;
+    height: 10%;
+    width: 100%;
+    // for space between MARROVER title and tabs
+    margin-bottom: 2%;
+    text-shadow: 0 0 2px #fff,
+    0 0 20px #fff,
+    0 0 30px #00aeff,
+    0 0 40px #00aeff,
+    0 0 70px #00aeffc4,
+}

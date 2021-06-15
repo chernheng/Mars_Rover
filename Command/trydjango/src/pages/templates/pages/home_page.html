@@ -1,0 +1,121 @@
+{% load sass_tags %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="{% sass_src 'pages/style.scss' %}" rel="stylesheet" type="text/css" />
+    <title>MARS ROVER</title>
+    
+
+</head>
+<body>
+    <div class="starfield">
+        <div class="static"></div>
+        <div class="moving-1"></div>
+        <div class="moving-2"></div>
+        <div class="moving-3"></div>
+
+        <div class="header">
+            <h1>MARS ROVER</h1>
+        </div>
+    
+        <div class="tab-boxes">
+            <button class="hometab" onclick="openPage('Home', this)" id="defaultOpen"><i class="fa fa-home"></i></button>
+            <button class="tablink" onclick="openPage('About', this)" id="abt-tab">About our project</button>
+            <button class="tablink" onclick="openPage('Our goals', this)" id="goals-tab">Our goals</button>
+            <button class="tablink" onclick="openPage('Milestones', this)" id="milestons-tab">Milestones</button>
+            <button class="tablink" onclick="openPage('Extensions', this)" id="extensions-tab">Extensions</button>
+        </div>
+            <div id="Home" class="hometab-content">
+                <div class="wrapper">
+                    <button class="box" id="map-redirect">
+                        INITIATE ROVER
+                    </button>
+                </div>
+            </div>
+            <div id="About" class="tab-header">
+                <h2>About our project</h2>
+                <p>Testing</p>
+            </div>
+            <div id="Our goals" class="tab-header">
+                <h2>Our goals</h2>
+                <p>Testing 2</p>
+            </div>
+            <div id="Milestones" class="tab-header">
+                <h2>Milestones</h2>
+                <p>Testing 3</p>
+            </div>
+            <div id="Extensions" class="tab-header">
+                <h2>Extensions</h2>
+                <p>Testing 4</p>
+            </div>
+        
+    
+        
+    </div>
+    <script>
+        function openPage(pageName, elmnt) {
+            // Hide all elements with class="tabcontent" by default */
+            var i, tabheader, homeheader, tablinks, hometab;
+            tabheader = document.getElementsByClassName("tab-header");
+            for (i = 0; i < tabheader.length; i++) {
+                tabheader[i].style.display = "none";
+            }
+            homeheader = document.getElementsByClassName("hometab-content");
+            homeheader[0].style.display = "none";
+            // Show the specific tab content
+            document.getElementById(pageName).style.display = "block";
+
+            // Remove the background color of all tablinks/buttons
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "#dbc6d0";
+                tablinks[i].style.borderColor = "white";
+            }
+            hometab = tablinks = document.getElementsByClassName("hometab");
+            hometab[0].style.backgroundColor = "#dbc6d0";
+            hometab[0].style.borderColor = "white";
+            // Add the specific color to the button used to open the tab content
+            elmnt.style.backgroundColor = "white";
+            elmnt.style.borderColor = "#dbc6d0";
+
+        }
+        // Get the element with id="defaultOpen" and click on it
+        document.querySelector('#defaultOpen').click();
+
+        const mapSocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/map_route/'
+            );
+        const updateSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/update/data/'
+        );
+        
+        document.querySelector('#map-redirect').onclick = function(e) {
+            
+            mapSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': 'start'
+            }));
+            
+            updateSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': JSON.stringify({'start': 1})
+            }));
+            window.location.href = "map_route/";
+        }
+
+
+    </script>
+
+
+</body>
+</html>

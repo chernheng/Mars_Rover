@@ -1,0 +1,142 @@
+{% load sass_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="{% sass_src 'map_route/style.scss' %}" rel="stylesheet" type="text/css" />
+    <title>MAP VIEW</title>
+
+</head>
+<body>
+    <div class="starfield">
+        <div class="static"></div>
+        <div class="moving-1"></div>
+        <div class="moving-2"></div>
+        <div class="moving-3"></div>
+
+        <div class="batteryContainer">
+            <div class="batteryOuter">
+                <div id="batteryLevel"></div>
+            </div>
+            <div class="batteryBump"></div>
+        </div>
+        <div class="battery-percent" id="battery-value">
+            80%
+        </div>
+
+        <div class="header">
+            <h1>MARS ROVER</h1>
+        </div>
+
+        <button class="reset-button" id="clear-database-submit">RESET ROVER</button>
+        <section class="color-input">
+            <input id="target-color-input" type="text" size="18" placeholder="Input target object colour" autocomplete="on">
+            <button id="target-color-submit">Submit</button>
+        </section>
+        <div class="dropdown">
+            <button class="dropdown-button" id="speed-input">Toggle speed of rover</button>
+            <div class="dropdown-content">
+                <button id=low-speed>Low Speed</button>
+                <button id=med-speed>Med Speed</button>
+                <button id=high-speed>High Speed</button>
+            </div>
+        </div>
+        <div class="img-grid">
+            <img id="grid-map" src="" class="center"><br>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/map_route/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            data = JSON.parse(e.data);
+            console.log(data.text);
+            if (data.text.substring(0,9) =="battery: "){
+                message = data.text.substring(9,12);
+                document.querySelector('#batteryLevel').style = "width:"+message;
+                document.querySelector('#battery-value').innerHTML = message;
+            }
+            else if (data.text=="critical_power") {
+                var warning_update;
+                warning_update = document.getElementsByClassName("warning");
+                warning_update[0].style.display = "block";
+                
+            }
+            else{
+                message = 'data:image/png;base64,'+data.text;
+                document.querySelector('#grid-map').src = (message);
+            }
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        // when user clicks on clear button to clear database
+        document.querySelector('#low-speed').onclick = function(e) {
+            document.querySelector('#speed-input').innerHTML = "Low Speed";
+            chatSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': 'low_speed'
+            }));
+        };
+        document.querySelector('#med-speed').onclick = function(e) {
+            document.querySelector('#speed-input').innerHTML = "Med Speed";
+            chatSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': 'med_speed'
+            }));
+        };
+        document.querySelector('#high-speed').onclick = function(e) {
+            document.querySelector('#speed-input').innerHTML = "High Speed";
+            chatSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': 'high_speed'
+            }));
+        };
+        // user inputs target color
+        document.querySelector('#target-color-input').focus();
+        document.querySelector('#target-color-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#target-color-submit').click();
+            }
+        };
+
+        document.querySelector('#target-color-submit').onclick = function(e) {
+            const colorInputDom = document.querySelector('#target-color-input');
+            const tar_color = colorInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': tar_color
+            }));
+            // to clear the text from existing textbox
+            colorInputDom.value = '';
+        };
+
+        //user changes rover's speed
+        document.querySelector('#clear-database-submit').onclick = function(e) {
+            chatSocket.send(JSON.stringify({
+                'type': 'receive',
+                'text': 'clear'
+            }));
+            window.location.href = "..";
+        };
+        var warning_display;
+        warning_display = document.getElementsByClassName("warning");
+        warning_display[0].style.display = "none";
+    </script>
+</body>
+</html>
