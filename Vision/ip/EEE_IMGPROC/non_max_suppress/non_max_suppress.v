@@ -125,7 +125,7 @@ always @ (posedge clk) begin
 
     if (Gx_reg != 0) begin
         if (div_res > 0) begin
-            if (div_res > 23) begin
+		if (div_res > 20) begin
                 dir <= 2'b00;   // vertical
             end else if (div_res > 3) begin
                 dir <= 2'b01;   // right diag
@@ -133,7 +133,7 @@ always @ (posedge clk) begin
                 dir <= 2'b11;   // Horizontal
             end
         end else begin
-            if (div_res < -23) begin
+		if (div_res < -20) begin
                 dir <= 2'b00;   // vertical
             end else if (div_res < -3) begin
                 dir <= 2'b10;   // left diag
